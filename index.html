@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>今天吃什么</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 480px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            text-align: center;
+            padding: 40px 0 30px;
+        }
+        
+        .header h1 {
+            font-size: 36px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #fff 0%, #a8edea 50%, #fed6e3 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.6);
+            font-size: 14px;
+        }
+        
+        .card {
+            background: rgba(255,255,255,0.08);
+            border-radius: 24px;
+            padding: 24px;
+            border: 1px solid rgba(255,255,255,0.1);
+            margin-bottom: 16px;
+        }
+        
+        /* 轮播区域 */
+        .slot-machine {
+            background: rgba(0,0,0,0.3);
+            border-radius: 20px;
+            padding: 30px 20px;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+            height: 180px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slot-window {
+            height: 140px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .slot-items {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        
+        .slot-items.spinning {
+            animation: slotSpin 0.08s linear infinite;
+        }
+        
+        @keyframes slotSpin {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-140px); }
+        }
+        
+        .slot-item {
+            height: 140px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        
+        .slot-icon {
+            font-size: 72px;
+            margin-bottom: 8px;
+            line-height: 1;
+        }
+        
+        .slot-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .empty-text {
+            color: rgba(255,255,255,0.5);
+            font-size: 16px;
+            text-align: center;
+        }
+        
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+        
+        .btn-small {
+            padding: 10px 16px;
+            font-size: 14px;
+            width: auto;
+        }
+        
+        .btn-delete {
+            background: rgba(244, 67, 54, 0.2);
+            color: #ff8a80;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: white;
+            margin-bottom: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .food-count {
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            font-weight: normal;
+        }
+        
+        .food-list {
+            max-height: 240px;
+            overflow-y: auto;
+            margin-bottom: 16px;
+        }
+        
+        .food-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 16px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            margin-bottom: 8px;
+        }
+        
+        .food-item-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 15px;
+            color: white;
+        }
+        
+        .food-icon {
+            font-size: 24px;
+        }
+        
+        .add-form {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid rgba(255,255,255,0.15);
+            border-radius: 12px;
+            font-size: 15px;
+            background: rgba(0,0,0,0.2);
+            color: white;
+            outline: none;
+        }
+        
+        .input::placeholder {
+            color: rgba(255,255,255,0.4);
+        }
+        
+        .confetti {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            pointer-events: none;
+            animation: fall 2s ease-out forwards;
+        }
+        
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>今天吃什么</h1>
+            <p>选择困难症终结者</p>
+        </div>
+        
+        <div class="card">
+            <div class="slot-machine" id="slot-display">
+                <div class="empty-text">点击下方按钮，让命运决定今天吃什么</div>
+            </div>
+            
+            <button class="btn btn-primary" id="spin-btn" onclick="toggleSpin()">🎲 开始随机</button>
+        </div>
+        
+        <div class="card">
+            <div class="section-title">
+                <span>📝 我的菜品库</span>
+                <span class="food-count" id="food-count">共 0 道</span>
+            </div>
+            
+            <div class="food-list" id="food-list"></div>
+            
+            <div class="add-form">
+                <input type="text" class="input" id="new-food-name" placeholder="输入菜品名称" maxlength="20">
+                <button class="btn btn-primary btn-small" onclick="addFood()">添加</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 默认菜品
+        const defaultFoods = [
+            { id: 1, name: '麻辣烫', icon: '🍲' },
+            { id: 2, name: '火锅', icon: '🥘' },
+            { id: 3, name: '烧烤', icon: '🍢' },
+            { id: 4, name: '寿司', icon: '🍣' },
+            { id: 5, name: '披萨', icon: '🍕' },
+            { id: 6, name: '汉堡', icon: '🍔' },
+            { id: 7, name: '面条', icon: '🍜' },
+            { id: 8, name: '炒饭', icon: '🍛' },
+            { id: 9, name: '沙拉', icon: '🥗' },
+            { id: 10, name: '饺子', icon: '🥟' },
+            { id: 11, name: '炸鸡', icon: '🍗' },
+            { id: 12, name: '奶茶', icon: '🧋' }
+        ];
+        
+        let foods = JSON.parse(localStorage.getItem('myFoods')) || [...defaultFoods];
+        let isSpinning = false;
+        let spinInterval = null;
+        
+        function saveFoods() {
+            localStorage.setItem('myFoods', JSON.stringify(foods));
+            updateCount();
+        }
+        
+        function updateCount() {
+            document.getElementById('food-count').textContent = `共 ${foods.length} 道`;
+        }
+        
+        function renderFoodList() {
+            const list = document.getElementById('food-list');
+            if (foods.length === 0) {
+                list.innerHTML = '';
+                updateCount();
+                return;
+            }
+            
+            list.innerHTML = foods.map(food => `
+                <div class="food-item">
+                    <div class="food-item-info">
+                        <span class="food-icon">${food.icon}</span>
+                        <span>${food.name}</span>
+                    </div>
+                    <button class="btn-delete" onclick="deleteFood(${food.id})">删除</button>
+                </div>
+            `).join('');
+            updateCount();
+        }
+        
+        function getIcon(name) {
+            const keywords = [
+                { keys: ['面', '粉', '拉面', '牛肉面', '海鲜面', '米线', '螺蛳粉'], icon: '🍜' },
+                { keys: ['饺子', '水饺', '蒸饺', '煎饺', '馄饨', '抄手'], icon: '🥟' },
+                { keys: ['饭', '炒饭', '盖饭', '拌饭', '煲仔饭'], icon: '🍛' },
+                { keys: ['火锅', '串串', '麻辣烫', '冒菜'], icon: '🥘' },
+                { keys: ['烧烤', '烤肉', '烤串'], icon: '🍢' },
+                { keys: ['寿司', '日料'], icon: '🍣' },
+                { keys: ['披萨', 'pizza'], icon: '🍕' },
+                { keys: ['汉堡', '三明治'], icon: '🍔' },
+                { keys: ['沙拉', '轻食'], icon: '🥗' },
+                { keys: ['鸡', '炸鸡', '烤鸡', '鸡翅'], icon: '🍗' },
+                { keys: ['鱼', '烤鱼', '水煮鱼'], icon: '🐟' },
+                { keys: ['虾', '龙虾', '小龙虾'], icon: '🦐' },
+                { keys: ['牛', '牛肉', '牛排', '肥牛'], icon: '🥩' },
+                { keys: ['粥', '稀饭'], icon: '🥣' },
+                { keys: ['包', '包子', '汤包'], icon: '🥟' },
+                { keys: ['汤', '煲汤'], icon: '🍲' },
+                { keys: ['奶', '奶茶', '牛奶'], icon: '🧋' },
+                { keys: ['咖啡'], icon: '☕' },
+                { keys: ['蛋糕', '甜点', '甜品'], icon: '🍰' },
+                { keys: ['冰淇淋', '雪糕'], icon: '🍦' },
+                { keys: ['肯德基', '麦当劳', 'KFC'], icon: '🍟' }
+            ];
+            
+            for (const item of keywords) {
+                for (const key of item.keys) {
+                    if (name.includes(key)) return item.icon;
+                }
+            }
+            return ['🍜', '🍲', '🥘', '🍛', '🍝', '🍣', '🍕', '🍔', '🥗', '🥟', '🍗', '🥩'][Math.floor(Math.random() * 12)];
+        }
+        
+        function addFood() {
+            const input = document.getElementById('new-food-name');
+            const name = input.value.trim();
+            
+            if (!name) return;
+            
+            foods.push({
+                id: Date.now(),
+                name: name,
+                icon: getIcon(name)
+            });
+            
+            saveFoods();
+            renderFoodList();
+            input.value = '';
+        }
+        
+        function deleteFood(id) {
+            foods = foods.filter(f => f.id !== id);
+            saveFoods();
+            renderFoodList();
+        }
+        
+        function toggleSpin() {
+            const btn = document.getElementById('spin-btn');
+            const display = document.getElementById('slot-display');
+            
+            if (isSpinning) {
+                // 停止
+                clearInterval(spinInterval);
+                isSpinning = false;
+                btn.textContent = '🎲 开始随机';
+                
+                const food = foods[Math.floor(Math.random() * foods.length)];
+                display.innerHTML = `
+                    <div class="slot-window">
+                        <div class="slot-item">
+                            <div class="slot-icon">${food.icon}</div>
+                            <div class="slot-name">${food.name}</div>
+                        </div>
+                    </div>
+                `;
+                createConfetti();
+            } else {
+                // 开始
+                if (foods.length === 0) {
+                    alert('请先添加菜品');
+                    return;
+                }
+                
+                isSpinning = true;
+                btn.textContent = '⏹️ 停止';
+                
+                // 创建三倍菜品用于无缝滚动
+                const tripleFoods = [...foods, ...foods, ...foods];
+                display.innerHTML = `
+                    <div class="slot-window">
+                        <div class="slot-items spinning" id="spin-items">
+                            ${tripleFoods.map(f => `
+                                <div class="slot-item">
+                                    <div class="slot-icon">${f.icon}</div>
+                                    <div class="slot-name">${f.name}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+        }
+        
+        function createConfetti() {
+            const colors = ['#667eea', '#764ba2', '#f093fb', '#f5576c', '#4facfe'];
+            for (let i = 0; i < 20; i++) {
+                setTimeout(() => {
+                    const c = document.createElement('div');
+                    c.className = 'confetti';
+                    c.style.left = Math.random() * 100 + 'vw';
+                    c.style.top = '50%';
+                    c.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                    c.style.borderRadius = Math.random() > 0.5 ? '50%' : '0';
+                    document.body.appendChild(c);
+                    setTimeout(() => c.remove(), 2000);
+                }, i * 30);
+            }
+        }
+        
+        // 回车添加
+        document.getElementById('new-food-name').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') addFood();
+        });
+        
+        renderFoodList();
+    </script>
+</body>
+</html>
